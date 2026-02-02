@@ -1,6 +1,4 @@
-#if canImport(UIKit)
 import SwiftUI
-import UIKit
 
 public struct OnboardingStepView<Content: View, Actions: View>: View {
     let icon: String
@@ -96,4 +94,3 @@ public struct OnboardingContinueButton: View {
         .disabled(!isEnabled || isLoading)
     }
 }
-#endif

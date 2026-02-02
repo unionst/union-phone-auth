@@ -1,6 +1,5 @@
-#if canImport(UIKit)
 import SwiftUI
-import UIKit
+import UnionCursor
 
 public struct CodeInput: View {
     @Binding var code: String
@@ -29,6 +28,10 @@ public struct CodeInput: View {
                         Text(String(code[code.index(code.startIndex, offsetBy: index)]))
                             .font(.title)
                             .fontWeight(.medium)
+                    } else if index == code.count && isFocused.wrappedValue {
+                        Cursor()
+                            .foregroundColor(.accentColor)
+                            .fontSize(24)
                     }
                 }
             }
@@ -48,4 +51,3 @@ public struct CodeInput: View {
         }
     }
 }
-#endif

@@ -1,6 +1,4 @@
-#if canImport(UIKit)
 import SwiftUI
-import UIKit
 import PhoneNumberKit
 
 public struct PhoneNumberField: View {
@@ -38,4 +36,3 @@ public struct PhoneNumberField: View {
             }
     }
 }
-#endif

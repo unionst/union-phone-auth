@@ -1,5 +1,5 @@
 {
-  "originHash" : "05fbb6d863658586abd6f23043039a662da8f20907fa97314f5e3578949f7b5f",
+  "originHash" : "915ca3feb2d65735eacec4b851f8fed5feb194de685d8d22bfd6e3b3e4dfacea",
   "pins" : [
     {
       "identity" : "phonenumberkit",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "7b0a5e858b328736d9b7e175b1620f452af6b699",
         "version" : "4.2.4"
+      }
+    },
+    {
+      "identity" : "union-cursor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/unionst/union-cursor.git",
+      "state" : {
+        "revision" : "6af34a00f14399318c99d1ba074335866cbd497c",
+        "version" : "1.0.0"
       }
     }
   ],

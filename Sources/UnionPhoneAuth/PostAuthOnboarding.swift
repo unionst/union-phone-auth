@@ -1,6 +1,4 @@
-#if canImport(UIKit)
 import SwiftUI
-import UIKit
 
 public enum OnboardingStep: Hashable, Sendable {
     case name
@@ -221,4 +219,3 @@ public struct PostAuthOnboardingView: View {
         }
     }
 }
-#endif

@@ -1,6 +1,4 @@
-#if canImport(UIKit)
 import SwiftUI
-import UIKit
 
 public struct OnboardingTextField: View {
     @Binding var text: String
@@ -68,4 +66,3 @@ public struct OnboardingTextField: View {
         .clipShape(Capsule())
     }
 }
-#endif

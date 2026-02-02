@@ -1,6 +1,4 @@
-#if canImport(UIKit)
 import SwiftUI
-import UIKit
 import PhoneNumberKit
 
 @MainActor
@@ -80,6 +78,7 @@ public struct PhoneAuthView: View {
     let onVerifyCode: (String, String) async throws -> VerifyResult
     let onComplete: ([PostAuthStep: String]) async throws -> Void
     let onCancel: () -> Void
+    let checkUsernameAvailability: ((String) async throws -> Bool)?
 
     @State private var navigationPath = NavigationPath()
     @State private var formattedPhoneNumber = ""
@@ -93,13 +92,15 @@ public struct PhoneAuthView: View {
         onSendCode: @escaping (String) async throws -> Void,
         onVerifyCode: @escaping (String, String) async throws -> VerifyResult,
         onComplete: @escaping ([PostAuthStep: String]) async throws -> Void,
-        onCancel: @escaping () -> Void
+        onCancel: @escaping () -> Void,
+        checkUsernameAvailability: ((String) async throws -> Bool)? = nil
     ) {
         self.model = model
         self.onSendCode = onSendCode
         self.onVerifyCode = onVerifyCode
         self.onComplete = onComplete
         self.onCancel = onCancel
+        self.checkUsernameAvailability = checkUsernameAvailability
     }
 
     public var body: some View {
@@ -154,7 +155,8 @@ public struct PhoneAuthView: View {
                 username: $model.username,
                 isLoading: $model.isLoading,
                 onContinue: advancePostAuth,
-                onCancel: onCancel
+                onCancel: onCancel,
+                checkAvailability: checkUsernameAvailability
             )
         }
     }
@@ -375,7 +377,7 @@ struct VerificationView: View {
                 }
                 .padding(.horizontal, 32)
 
-                CodeInputView(code: $verificationCode, isFocused: $isCodeFocused)
+                CodeInput(code: $verificationCode, isFocused: $isCodeFocused)
                     .padding(.horizontal, 32)
                     .padding(.top, 16)
 
@@ -526,54 +528,39 @@ struct UsernameEntryView: View {
     @Binding var isLoading: Bool
     let onContinue: () -> Void
     let onCancel: () -> Void
+    var checkAvailability: ((String) async throws -> Bool)?
 
-    @FocusState private var isFocused: Bool
-
-    private var isValid: Bool {
-        username.count >= 3
-    }
+    @State private var isUsernameValid = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                Image(systemName: "at")
+                Image(systemName: "person.crop.circle.badge.plus")
                     .font(.system(size: 64))
                     .foregroundStyle(.tint)
                     .symbolRenderingMode(.hierarchical)
 
                 VStack(spacing: 8) {
-                    Text("Pick a username")
+                    Text("Choose Username")
                         .font(.title2)
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Text("This is how others will find you")
+                    Text("Pick a unique username to continue.")
                         .font(.title3)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal, 32)
 
-                TextField("", text: $username, prompt: Text("username"))
-                    .keyboardType(.asciiCapable)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .font(.body)
-                    .padding()
-                    .frame(height: 56)
-                    .background(.quinary)
-                    .clipShape(Capsule())
-                    .padding(.horizontal, 32)
-                    .padding(.top, 16)
-                    .focused($isFocused)
-                    .onChange(of: username) { _, newValue in
-                        let processed = newValue
-                            .lowercased()
-                            .replacingOccurrences(of: "[^a-z0-9_]", with: "", options: .regularExpression)
-                        if processed != newValue || processed.count > 30 {
-                            username = String(processed.prefix(30))
-                        }
-                    }
+                UsernameField(
+                    username: $username,
+                    isValid: $isUsernameValid,
+                    checkAvailability: checkAvailability
+                )
+                .focused()
+                .padding(.horizontal, 32)
+                .padding(.top, 16)
 
                 Spacer()
             }
@@ -592,7 +579,7 @@ struct UsernameEntryView: View {
                 .frame(height: 44)
             }
             .buttonStyle(.glassProminent)
-            .disabled(!isValid || isLoading)
+            .disabled(!isUsernameValid || isLoading)
             .padding(.horizontal, 32)
             .padding(.bottom, 16)
         }
@@ -607,49 +594,5 @@ struct UsernameEntryView: View {
             }
             .sharedBackgroundVisibility(.visible)
         }
-        .onAppear {
-            isFocused = true
-        }
     }
 }
-
-struct CodeInputView: View {
-    @Binding var code: String
-    var isFocused: FocusState<Bool>.Binding
-
-    private let boxCount = 6
-
-    var body: some View {
-        HStack(spacing: 12) {
-            ForEach(0..<boxCount, id: \.self) { index in
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.quinary)
-                        .frame(width: 45, height: 56)
-
-                    if index < code.count {
-                        Text(String(code[code.index(code.startIndex, offsetBy: index)]))
-                            .font(.title)
-                            .fontWeight(.medium)
-                    }
-                }
-            }
-        }
-        .onTapGesture {
-            isFocused.wrappedValue = true
-        }
-        .overlay {
-            TextField("", text: $code)
-                .keyboardType(.numberPad)
-                .textContentType(.oneTimeCode)
-                .opacity(0.01)
-                .focused(isFocused)
-                .onChange(of: code) { _, newValue in
-                    if newValue.count > boxCount {
-                        code = String(newValue.prefix(boxCount))
-                    }
-                }
-        }
-    }
-}
-#endif

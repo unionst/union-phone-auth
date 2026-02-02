@@ -14,13 +14,15 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/marmelroy/PhoneNumberKit", from: "4.0.0")
+        .package(url: "https://github.com/marmelroy/PhoneNumberKit", from: "4.0.0"),
+        .package(url: "https://github.com/unionst/union-cursor.git", from: "1.0.0")
     ],
     targets: [
         .target(
             name: "UnionPhoneAuth",
             dependencies: [
-                .product(name: "PhoneNumberKit", package: "PhoneNumberKit")
+                .product(name: "PhoneNumberKit", package: "PhoneNumberKit"),
+                .product(name: "UnionCursor", package: "union-cursor")
             ],
             path: "Sources/UnionPhoneAuth"
         )
